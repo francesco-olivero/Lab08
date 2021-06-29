@@ -80,10 +80,10 @@ public class Model {
 		return this.percorsoBest ;
 	}
 	
-private void cerca(List<Airport> parziale, int livello, double soglia) {
+	private void cerca(List<Airport> parziale, int livello, double soglia) {
 		
-	Airport ultimo = parziale.get(parziale.size()-1) ;
-		
+		Airport ultimo = parziale.get(parziale.size()-1) ;
+			
 		// caso terminale: ho trovato l'arrivo
 		
 		if (parziale.size()>1 && getPesoParziale(parziale)<soglia)	{
