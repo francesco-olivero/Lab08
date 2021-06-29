@@ -18,6 +18,7 @@ public class Model {
 	
 	// variabili per la ricorsione
 		private List<Airport> percorsoBest ;
+		private double pesoPercorso;
 	
 	public Model() {
 		idMap = new HashMap<Integer,Airport>();
@@ -69,6 +70,7 @@ public class Model {
 	
 	public List<Airport> percorsoMigliore(Airport partenza, double soglia) {
 		this.percorsoBest =  new ArrayList<Airport>();
+		this.pesoPercorso = 0;
 		
 		List<Airport> parziale = new ArrayList<Airport>() ;
 		parziale.add(partenza) ;
@@ -87,6 +89,7 @@ private void cerca(List<Airport> parziale, int livello, double soglia) {
 		if (parziale.size()>1 && getPesoParziale(parziale)<soglia)	{	
 			 if(parziale.size() > this.percorsoBest.size() ) {
 				this.percorsoBest = new ArrayList<>(parziale) ;
+				this.pesoPercorso = getPesoParziale(this.percorsoBest);
 				
 			}
 		}else if (parziale.size()>1 && getPesoParziale(parziale)>=soglia) {
@@ -122,6 +125,10 @@ private void cerca(List<Airport> parziale, int livello, double soglia) {
 
 	public SimpleWeightedGraph<Airport, DefaultWeightedEdge> getGrafo() {
 		return grafo;
+	}
+
+	public double getPesoPercorso() {
+		return pesoPercorso;
 	}
 	
 	
