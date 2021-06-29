@@ -16,13 +16,16 @@ public class Model {
 	private Map<Integer, Airport> idMap;
 	private ExtFlightDelaysDAO dao;
 	
+	// variabili per la ricorsione
+		private List<Airport> percorsoBest ;
+	
 	public Model() {
 		idMap = new HashMap<Integer,Airport>();
 		dao = new ExtFlightDelaysDAO();
 		dao.loadAllAirports(idMap);
 	}
 	
-	public void creaGrafo(int distanzaMedia) {
+	public String creaGrafo(int distanzaMedia) {
 		grafo = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
 		//Aggiungere i vertici
@@ -40,6 +43,9 @@ public class Model {
 				grafo.setEdgeWeight(edge, newPeso);
 			}
 		}
+		return String.format("Grafo creato con %d vertici e %d archi\n",
+				this.grafo.vertexSet().size(),
+				this.grafo.edgeSet().size()) ;
 		
 	}
 	
@@ -59,5 +65,65 @@ public class Model {
 		}
 		return rotte;
 	}
+	
+	
+	public List<Airport> percorsoMigliore(Airport partenza, double soglia) {
+		this.percorsoBest =  new ArrayList<Airport>();
+		
+		List<Airport> parziale = new ArrayList<Airport>() ;
+		parziale.add(partenza) ;
+		
+		cerca(parziale, 1, soglia) ;
+		
+		return this.percorsoBest ;
+	}
+	
+private void cerca(List<Airport> parziale, int livello, double soglia) {
+		
+	Airport ultimo = parziale.get(parziale.size()-1) ;
+		
+		// caso terminale: ho trovato l'arrivo
+		
+		if (parziale.size()>1 && getPesoParziale(parziale)<soglia)	{	
+			 if(parziale.size() > this.percorsoBest.size() ) {
+				this.percorsoBest = new ArrayList<>(parziale) ;
+				
+			}
+		}else if (parziale.size()>1 && getPesoParziale(parziale)>=soglia) {
+			return;
+		}
+		
+		// generazione dei percorsi
+		// cerca i successori di 'ultimo'
+		for(DefaultWeightedEdge e: this.grafo.edgesOf(ultimo)) {
+			
+				Airport prossimo = Graphs.getOppositeVertex(this.grafo, e, ultimo) ;
+				
+				if(!parziale.contains(prossimo)) { // evita i cicli
+					parziale.add(prossimo);
+					cerca(parziale, livello + 1, soglia);
+					parziale.remove(parziale.size()-1) ;
+				}
+		}	
+	}
+
+	public double getPesoParziale(List<Airport> parziale) {
+		double peso = 0;
+		for (int i=0; i<parziale.size()-1; i++) { 
+			DefaultWeightedEdge dwe = this.grafo.getEdge(parziale.get(i), parziale.get(i+1));
+			peso+=this.grafo.getEdgeWeight(dwe);
+		}
+		return peso;
+	}
+
+	public Map<Integer, Airport> getIdMap() {
+		return idMap;
+	}
+
+	public SimpleWeightedGraph<Airport, DefaultWeightedEdge> getGrafo() {
+		return grafo;
+	}
+	
+	
 	
 }
