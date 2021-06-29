@@ -69,7 +69,7 @@ public class Model {
 	
 	
 	public List<Airport> percorsoMigliore(Airport partenza, double soglia) {
-		this.percorsoBest =  new ArrayList<Airport>();
+		this.percorsoBest =  null;
 		this.pesoPercorso = 0;
 		
 		List<Airport> parziale = new ArrayList<Airport>() ;
@@ -86,8 +86,12 @@ private void cerca(List<Airport> parziale, int livello, double soglia) {
 		
 		// caso terminale: ho trovato l'arrivo
 		
-		if (parziale.size()>1 && getPesoParziale(parziale)<soglia)	{	
-			 if(parziale.size() > this.percorsoBest.size() ) {
+		if (parziale.size()>1 && getPesoParziale(parziale)<soglia)	{
+			if(this.percorsoBest==null) {
+				this.percorsoBest = new ArrayList<>(parziale) ;
+				this.pesoPercorso = getPesoParziale(this.percorsoBest);
+			}
+			else if(parziale.size() > this.percorsoBest.size() ) { // LUNGHEZZA MIN/MAX
 				this.percorsoBest = new ArrayList<>(parziale) ;
 				this.pesoPercorso = getPesoParziale(this.percorsoBest);
 				
